@@ -81,7 +81,7 @@ export interface AppState {
   clearChat: () => void
   setChatHistory: (history: ChatMessage[]) => void
   setCurrentSessionId: (id: string | undefined) => void
-  addPendingSnippet: (path: string, content: string, line?: number) => void
+  addPendingSnippet: (path: string, content: string, lineStart?: number, lineEnd?: number) => void
   removePendingSnippet: (index: number) => void
   clearPendingContext: () => void
   setLeftWidth: (w: number) => void
