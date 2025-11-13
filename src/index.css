@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* CodeMirror active line background off */
+.cm-activeLine,
+.cm-activeLineGutter {
+  background: transparent !important;
+}
+
+/* Ensure editor area scrolls correctly inside flex containers */
+.cm-editor {
+  height: 100%;
+}
+.cm-scroller {
+  overflow: auto;
+}
+
+/* Subtle scrollbar for editor (CodeMirror) */
+.cm-scroller {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(75,85,99,0.5) transparent;
+}
+.cm-scroller::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.cm-scroller::-webkit-scrollbar-track {
+  background: transparent;
+}
+.cm-scroller::-webkit-scrollbar-thumb {
+  background-color: rgba(75,85,99,0.5);
+  border-radius: 4px;
+}
+.cm-scroller:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(107,114,128,0.7);
+}
+
+/* Subtle scrollbar for content areas */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #4b5563 transparent;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(75,85,99,0.5);
+  border-radius: 4px;
+}
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(107,114,128,0.7);
+}
