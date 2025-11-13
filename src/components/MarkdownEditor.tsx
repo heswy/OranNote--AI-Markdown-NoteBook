@@ -394,7 +394,8 @@ export const MarkdownEditor: React.FC = () => {
           p.drawImage(jpg, { x: 0, y: 0, width: pageWidth, height: pageHeight })
         }
         const pdfBytesStyled = await pdfDoc.save()
-        const blobStyled = new Blob([pdfBytesStyled], { type: 'application/pdf' })
+        const styledBuf = pdfBytesStyled.buffer.slice(pdfBytesStyled.byteOffset, pdfBytesStyled.byteOffset + pdfBytesStyled.byteLength)
+        const blobStyled = new Blob([styledBuf], { type: 'application/pdf' })
         const pdfPathStyled = activeFile!.replace(/\.md$/i, '.pdf')
         await FileSystemService.writeFile(pdfPathStyled, blobStyled, workspaceHandle as any, workspace)
         const filesStyled = await FileSystemService.getWorkspaceFiles(workspace!, workspaceHandle as any)
@@ -521,7 +522,8 @@ export const MarkdownEditor: React.FC = () => {
         }
       }
       const pdfBytes = await pdfDoc.save()
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' })
+      const plainBuf = pdfBytes.buffer.slice(pdfBytes.byteOffset, pdfBytes.byteOffset + pdfBytes.byteLength)
+      const blob = new Blob([plainBuf], { type: 'application/pdf' })
       const pdfPath = activeFile.replace(/\.md$/i, '.pdf')
       await FileSystemService.writeFile(pdfPath, blob, workspaceHandle as any, workspace)
       const files = await FileSystemService.getWorkspaceFiles(workspace, workspaceHandle as any)
