@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oran记 - AI 智能笔记软件</title>
+    <meta name="description" content="Oran记是一款现代化的AI智能笔记软件，支持Markdown编辑、AI助手、文件管理等功能，让您的笔记体验更加智能高效。">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <div class="logo-icon">🍊</div>
+                <span class="logo-text">Oran记</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features" class="nav-link">功能特色</a>
+                <a href="#guide" class="nav-link">使用指南</a>
+                <a href="#feedback" class="nav-link">反馈支持</a>
+                <a href="https://github.com/heswy/OranNote--AI-Markdown-NoteBook" target="_blank" class="github-btn">
+                    <svg class="github-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    GitHub
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主页面 -->
+    <main>
+        <!-- Hero 区域 -->
+        <section class="hero">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        智能笔记
+                        <span class="gradient-text">重新定义</span>
+                    </h1>
+                    <p class="hero-description">
+                        Oran记是一款现代化的AI智能笔记软件，集成Markdown编辑、AI助手、文件管理等功能，
+                        为您提供专业、高效的笔记体验。
+                    </p>
+                    <div class="hero-buttons">
+                        <button class="primary-btn" onclick="showExperienceModal(event)">
+                            立即体验
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5-5 5M6 12h12"/>
+                            </svg>
+                        </button>
+                        <button class="secondary-btn" onclick="scrollToSection('features')">
+                            了解更多
+                        </button>
+                    </div>
+                    <div class="hero-highlight">
+                        <span class="highlight-text">@ · 拖拽 · 划选，更轻盈</span>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="app-preview">
+                        <div class="preview-header">
+                            <div class="window-controls">
+                                <div class="window-dot red"></div>
+                                <div class="window-dot yellow"></div>
+                                <div class="window-dot green"></div>
+                            </div>
+                            <div class="preview-title">Oran记</div>
+                        </div>
+                        <div class="preview-content">
+                            <div class="preview-sidebar"></div>
+                            <div class="preview-editor">
+                                <div class="code-line"></div>
+                                <div class="code-line"></div>
+                                <div class="code-line short"></div>
+                                <div class="code-line"></div>
+                            </div>
+                            <div class="preview-ai">
+                                <div class="ai-bubble"></div>
+                                <div class="ai-bubble short"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 功能特色 -->
+        <section id="features" class="features">
+            <div class="container">
+                <h2 class="section-title">功能特色</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🤖</div>
+                        <h3>AI 智能助手</h3>
+                        <p>集成先进的AI技术，让您的笔记更加智能。支持@、拖拽或划选文本作为上下文向 AI 提问；支持自定义智能体打造您的专属助手。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📝</div>
+                        <h3>Markdown 编辑</h3>
+                        <p>支持标准Markdown语法，实时预览，代码高亮，数学公式，让您的内容呈现更加专业。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📁</div>
+                        <h3>文件管理</h3>
+                        <p>直观的文件树结构，支持文件夹管理，快速搜索，让您的笔记组织井井有条。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎨</div>
+                        <h3>现代界面</h3>
+                        <p>采用现代化的设计理念，深色主题，流畅动画，可调整布局，提供舒适的使用体验。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>高效性能</h3>
+                        <p>基于现代Web技术构建，响应迅速，支持大文件编辑，本地存储，保护您的数据安全。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔧</div>
+                        <h3>开源免费</h3>
+                        <p>完全开源的项目，自由使用，持续更新，欢迎贡献代码，共同打造更好的笔记工具。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 使用指南 -->
+        <section id="guide" class="guide">
+            <div class="container">
+                <h2 class="section-title">使用指南</h2>
+                <div class="guide-steps">
+                    <div class="guide-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>下载安装</h3>
+                            <p>访问GitHub仓库，下载最新版本，按照说明进行安装配置。</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>选择工作区</h3>
+                            <p>启动应用后，选择您的笔记存储目录，Oran记会自动加载文件结构。</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>开始写作</h3>
+                            <p>点击文件进行编辑，使用Markdown语法，随时调用AI助手获得帮助。</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>管理笔记</h3>
+                            <p>使用文件树管理您的笔记，支持新建、重命名、删除等操作。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 反馈支持 -->
+        <section id="feedback" class="feedback">
+            <div class="container">
+                <h2 class="section-title">反馈支持</h2>
+                <p class="feedback-description">
+                    您的反馈对我们非常重要，欢迎通过以下方式联系我们
+                </p>
+                <div class="feedback-links">
+                    <a href="https://github.com/heswy/OranNote--AI-Markdown-NoteBook/issues" target="_blank" class="feedback-card github">
+                        <div class="feedback-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                        </div>
+                        <h3>GitHub Issues</h3>
+                        <p>提交Bug报告、功能建议或参与讨论</p>
+                        <span class="feedback-btn">打开 Issues</span>
+                    </a>
+                    <a href="mailto:Heswyc@gmail.com" class="feedback-card email">
+                        <div class="feedback-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                            </svg>
+                        </div>
+                        <h3>邮箱联系</h3>
+                        <p>发送邮件至 Heswyc@gmail.com</p>
+                        <span class="feedback-btn">发送邮件</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <div class="logo-icon">🍊</div>
+                    <span class="logo-text">Oran记</span>
+                </div>
+                <p class="footer-description">开源AI智能笔记软件</p>
+                <div class="footer-disclaimer">
+                    <p>⚠️ 开源产品 · 初始版本 · 可能存在Bug</p>
+                    <p>Windows平台兼容性可能不稳定，推荐使用Mac系统或通过GitHub获取源码自行编译</p>
+                </div>
+                <div class="footer-links">
+                    <a href="https://github.com/heswy/OranNote--AI-Markdown-NoteBook" target="_blank">GitHub</a>
+                    <a href="mailto:Heswyc@gmail.com">联系我们</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Oran记. 开源项目，自由使用。</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 体验选择浮窗 -->
+    <div id="experienceModal" class="experience-modal">
+        <div class="experience-content">
+            <button class="experience-close" onclick="hideExperienceModal()">&times;</button>
+            <h3>选择体验方式</h3>
+            <div class="experience-options">
+                <a href="https://github.com/heswy/OranNote--AI-Markdown-NoteBook" target="_blank" class="experience-option github-option">
+                    <div class="option-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                    </div>
+                    <div class="option-content">
+                        <h4>访问 GitHub</h4>
+                        <p>查看源码、文档和社区</p>
+                    </div>
+                    <svg class="option-arrow-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
+                
+                <button class="experience-option download-option" onclick="showDownloadModal(); hideExperienceModal();">
+                    <div class="option-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                    <div class="option-content">
+                        <h4>下载安装包</h4>
+                        <p>直接下载使用</p>
+                    </div>
+                    <svg class="option-arrow-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 下载模态框 -->
+    <div id="downloadModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>选择您的平台</h3>
+                <button class="modal-close" onclick="hideDownloadModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="platform-grid">
+                    <div class="platform-card">
+                        <div class="platform-icon">🍎</div>
+                        <h4>macOS</h4>
+                        <p>适用于 Apple Silicon (M1/M2)</p>
+                        <div class="download-options">
+                            <a href="../release/Oran记-0.0.0-arm64.dmg" class="download-option" download>
+                                <span class="option-name">DMG 安装包</span>
+                                <span class="option-size">推荐</span>
+                            </a>
+                            <a href="../release/Oran记-0.0.0-arm64-mac.zip" class="download-option" download>
+                                <span class="option-name">ZIP 压缩包</span>
+                                <span class="option-size">便携版</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="platform-card">
+                        <div class="platform-icon">🪟</div>
+                        <h4>Windows</h4>
+                        <p>适用于 Windows 系统</p>
+                        <div class="download-options">
+                            <a href="../release/Oran记-0.0.0-win.zip" class="download-option" download>
+                                <span class="option-name">x64 版本</span>
+                                <span class="option-size">64位系统</span>
+                            </a>
+                            <a href="../release/Oran记-0.0.0-arm64-win.zip" class="download-option" download>
+                                <span class="option-name">ARM64 版本</span>
+                                <span class="option-size">ARM设备</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="download-notes">
+                    <h5>安装说明</h5>
+                    <ul>
+                        <li>macOS：下载 DMG 文件后双击安装，或将应用拖到 Applications 文件夹</li>
+                        <li>Windows：下载 ZIP 文件后解压，运行 Oran记.exe 即可使用</li>
+                        <li>无需安装额外依赖，开箱即用</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
