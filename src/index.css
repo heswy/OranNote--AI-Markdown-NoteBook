@@ -1,0 +1,238 @@
+@import './styles/tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: var(--font-sans);
+  line-height: var(--leading-normal);
+  font-weight: var(--font-normal);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ========== CodeMirror 样式覆盖 ========== */
+.cm-editor {
+  height: 100%;
+}
+
+.cm-scroller {
+  overflow: auto;
+  font-family: var(--font-mono) !important;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* 禁用 active line 背景 */
+.cm-activeLine,
+.cm-activeLineGutter {
+  background: transparent !important;
+}
+
+/* 当前行高亮 - 使用 subtle 样式 */
+.cm-line {
+  padding: 0 8px;
+}
+
+/* 选中文字样式 */
+.cm-selectionBackground {
+  background: rgba(249, 115, 22, 0.3) !important;
+}
+
+/* 光标样式 */
+.cm-cursor {
+  border-left-color: var(--color-primary-500) !important;
+  border-left-width: 2px !important;
+}
+
+/* Gutter 样式 */
+.cm-gutters {
+  background: transparent !important;
+  border-right: 1px solid var(--color-border) !important;
+}
+
+.cm-gutterElement {
+  color: var(--color-text-tertiary) !important;
+  font-size: 12px !important;
+  padding: 0 8px !important;
+}
+
+/* ========== 自定义滚动条 - 内容区域 ========== */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ========== 拖拽分割线样式 ========== */
+.resize-handle {
+  position: relative;
+  transition: background-color var(--transition-fast);
+}
+
+.resize-handle:hover {
+  background-color: rgba(249, 115, 22, 0.3);
+}
+
+.resize-handle:active {
+  background-color: rgba(249, 115, 22, 0.5);
+}
+
+.resize-handle::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px;
+  height: 24px;
+  background-color: var(--color-text-tertiary);
+  border-radius: 1px;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.resize-handle:hover::before {
+  opacity: 1;
+}
+
+/* ========== 按钮基础样式 ========== */
+.btn {
+  @apply inline-flex items-center justify-center px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-fast;
+}
+
+.btn-primary {
+  @apply bg-primary-600 text-white hover:bg-primary-500 active:bg-primary-700;
+}
+
+.btn-secondary {
+  @apply bg-bg-surface text-text-secondary hover:bg-bg-surface-hover hover:text-text-primary;
+}
+
+.btn-ghost {
+  @apply text-text-secondary hover:text-text-primary hover:bg-white/5;
+}
+
+/* ========== 输入框基础样式 ========== */
+.input {
+  @apply w-full px-3 py-2 bg-bg-surface border border-border rounded-lg text-text-primary placeholder:text-text-tertiary;
+  @apply focus:outline-none focus:border-border-focus transition-colors duration-fast;
+}
+
+/* ========== 卡片基础样式 ========== */
+.card {
+  @apply bg-bg-elevated border border-border rounded-lg;
+}
+
+/* ========== 工具提示样式 ========== */
+.tooltip {
+  @apply absolute px-2 py-1 bg-bg-overlay text-text-primary text-xs rounded shadow-lg;
+  @apply opacity-0 invisible transition-all duration-fast;
+}
+
+.tooltip-trigger:hover .tooltip {
+  @apply opacity-100 visible;
+}
+
+/* ========== 动画工具类 ========== */
+.animate-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.2s ease-out;
+}
+
+/* ========== 响应式缩减动画 ========== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ========== Select 下拉框样式重置 ========== */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+/* 移除 IE 的默认箭头 */
+select::-ms-expand {
+  display: none;
+}
+
+/* ========== Select Option 样式（尽力覆盖） ========== */
+select option {
+  background-color: var(--color-bg-elevated) !important;
+  color: var(--color-text-primary) !important;
+  font-family: var(--font-sans) !important;
+}
+
+select option:hover,
+select option:focus,
+select option:checked,
+select option:active,
+select option:selected {
+  background-color: var(--color-primary-600) !important;
+  color: white !important;
+  box-shadow: inset 0 0 0 100px var(--color-primary-600) !important;
+}
+
+/* macOS 系统样式覆盖尝试 */
+@supports (-webkit-appearance: none) {
+  select {
+    background-color: var(--color-bg-surface) !important;
+  }
+  
+  select option {
+    background-color: var(--color-bg-elevated) !important;
+    color: var(--color-text-primary) !important;
+  }
+}
+
+/* ========== 输入框 placeholder 颜色 ========== */
+::placeholder {
+  color: var(--color-text-tertiary);
+  opacity: 1;
+}
+
+/* ========== 焦点样式优化 ========== */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
+}
