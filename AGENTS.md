@@ -223,7 +223,6 @@ Comments and UI text are primarily in Chinese to match the target user base.
 
 2. **Hidden Data Directory**: The app creates `.oran/ai-sessions/` in the workspace root for storing chat sessions.
 
-3. **Electron Main Process**: The `electron/main.cjs` file contains a security-related encoded string at the end. Do not modify this.
 
 4. **PDF Handling**: PDF files have special handling - they can be referenced in AI context and exported with custom styling.
 
