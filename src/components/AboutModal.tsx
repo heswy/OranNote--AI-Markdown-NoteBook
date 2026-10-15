@@ -21,7 +21,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose }) => {
           </button>
         </div>
         <div className="p-6 space-y-3 text-gray-200">
-          <div className="text-sm">📚 作者：阿橙 & Trae</div>
+          <div className="text-sm">📚 作者：heswy</div>
           <div className="text-sm">🙏 感谢使用！如果有反馈请发送至 ✉️ heswyc@gmail.com</div>
           <div className="text-sm">✨ 祝你写作顺利，灵感满满！</div>
           <div className="mt-3">
