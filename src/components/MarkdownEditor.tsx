@@ -269,6 +269,18 @@ const ToolbarButton: React.FC<{
   )
 }
 
+// HTML 属性值转义，防止引号/标签注入
+const escapeHtmlAttr = (value: string): string =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+
+// 是否为可直接交给浏览器加载的图片地址
+const isDirectImageSrc = (src: string): boolean => /^(?:https?:|data:)/i.test(src)
+
 export const MarkdownEditor: React.FC = () => {
   const { 
     activeFile, 
@@ -318,7 +330,11 @@ export const MarkdownEditor: React.FC = () => {
     renderer.image = ({ href, text }: any) => {
       const src = href || ''
       const alt = text || ''
-      return `<img data-origin-src="${src}" alt="${alt}" loading="lazy" />`
+      const escapedSrc = escapeHtmlAttr(src)
+      const escapedAlt = escapeHtmlAttr(alt)
+      // 网络图片与 data URI 可直接作为 src；本地图片先保留原始地址，由预览 effect 读取为 Blob URL
+      const srcAttr = isDirectImageSrc(src) ? ` src="${escapedSrc}"` : ''
+      return `<img data-origin-src="${escapedSrc}"${srcAttr} alt="${escapedAlt}" loading="lazy" />`
     }
     
     marked.setOptions({ renderer, gfm: true, breaks: false, pedantic: false })
@@ -413,6 +429,34 @@ export const MarkdownEditor: React.FC = () => {
   // 预览图片处理
   useEffect(() => {
     let cancelled = false
+    const cache = objectUrlCacheRef.current
+
+    // 把 Markdown 中的图片地址解析为工作区内的绝对路径
+    const resolveOriginPath = (origin: string): string => {
+      // 去掉查询串与锚点，仅按路径定位文件
+      const withoutQuery = origin.split('#')[0].split('?')[0]
+      let decoded = withoutQuery
+      try {
+        decoded = decodeURIComponent(withoutQuery)
+      } catch {
+        decoded = withoutQuery
+      }
+      if (!decoded) return ''
+      // 以 / 开头视为相对工作区根目录
+      if (decoded.startsWith('/')) {
+        const rel = decoded.replace(/^\/+/, '')
+        return workspace ? `${workspace}/${rel}` : rel
+      }
+      // 相对路径以当前文件所在目录为基准
+      const segments = activeFile ? activeFile.split('/').slice(0, -1) : []
+      for (const part of decoded.split('/')) {
+        if (!part || part === '.') continue
+        if (part === '..') segments.pop()
+        else segments.push(part)
+      }
+      return segments.join('/')
+    }
+
     const run = async () => {
       const container = previewRef.current
       if (!container || cancelled) return
@@ -421,12 +465,47 @@ export const MarkdownEditor: React.FC = () => {
         if (cancelled) return
         const el = img as HTMLImageElement
         const origin = el.getAttribute('data-origin-src') || ''
-        if (!origin || origin.startsWith('http') || origin.startsWith('data:')) continue
-        // 简化的图片加载逻辑
+        // 网络图片与 data URI 已有 src，无需处理
+        if (!origin || isDirectImageSrc(origin)) continue
+
+        const absPath = resolveOriginPath(origin)
+        if (!absPath) continue
+
+        const cached = cache.get(absPath)
+        if (cached) {
+          el.src = cached
+          continue
+        }
+
+        try {
+          const blob = await FileSystemService.readFileBlob(absPath, workspace, workspaceHandle as any)
+          if (!blob) continue
+          // 读取期间组件可能已卸载或内容已变化，避免泄漏
+          if (cancelled) return
+          const url = URL.createObjectURL(blob)
+          cache.set(absPath, url)
+          el.src = url
+        } catch (error) {
+          console.error('预览图片加载失败:', absPath, error)
+        }
       }
     }
     run()
-  }, [content, editorMode])
+
+    return () => {
+      cancelled = true
+    }
+  }, [content, editorMode, activeFile, workspace, workspaceHandle])
+
+  // 对象 URL 只在组件真正卸载时统一回收：
+  // 依赖变化（例如打字触发 content 更新）不清理缓存，避免图片反复重建、闪烁与重复读盘
+  useEffect(() => {
+    const cache = objectUrlCacheRef.current
+    return () => {
+      cache.forEach((url) => URL.revokeObjectURL(url))
+      cache.clear()
+    }
+  }, [])
 
   if (!activeFile) {
     return (
