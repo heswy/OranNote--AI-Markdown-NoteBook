@@ -1,7 +1,24 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
 
 let win
+
+// IPC handler：渲染层通过 preload 暴露的桥调用
+function registerIpcHandlers() {
+  ipcMain.handle('app:ping', async () => ({
+    ok: true,
+    name: 'OranNote',
+    version: app.getVersion(),
+    platform: process.platform,
+    electron: process.versions.electron,
+    chrome: process.versions.chrome
+  }))
+
+  ipcMain.handle('pdf:export', async () => ({
+    ok: false,
+    reason: 'not-implemented'
+  }))
+}
 
 function createWindow() {
   win = new BrowserWindow({
@@ -11,6 +28,7 @@ function createWindow() {
     show: false,
     backgroundColor: '#111827',
     webPreferences: {
+      preload: path.join(__dirname, 'preload.cjs'),
       nodeIntegration: false,
       contextIsolation: true
     }
@@ -32,6 +50,7 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  registerIpcHandlers()
   createWindow()
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
