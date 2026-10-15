@@ -340,7 +340,6 @@ export class AIService {
       if (provider === 'kimi') {
         // Kimi Code API - 尝试调用一个简单的 chat 请求来验证
         // 注意：Kimi Code API 的实际端点可能需要根据官方文档调整
-        console.log('正在验证 Kimi Code API...')
         
         try {
           const response = await fetch('https://api.kimi.com/coding/v1/chat/completions', {
@@ -355,7 +354,6 @@ export class AIService {
             })
           })
           
-          console.log('Kimi API 响应状态:', response.status)
           
           if (response.ok) {
             return { valid: true }

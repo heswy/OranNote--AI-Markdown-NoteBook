@@ -10,7 +10,6 @@ export class FileSystemService {
         // @ts-ignore - showDirectoryPicker 是实验性 API
         const dirHandle = await window.showDirectoryPicker()
         const workspacePath = dirHandle.name
-        console.log(`选择的工作区: ${workspacePath}`)
         return { path: workspacePath, dirHandle }
       } else {
         // 降级方案：使用文件输入来选择文件夹
@@ -27,7 +26,6 @@ export class FileSystemService {
               const firstFile = files[0]
               const path = firstFile.webkitRelativePath || firstFile.name
               const folderName = path.split('/')[0] || 'workspace'
-              console.log(`选择的工作区: ${folderName}`)
               resolve({ path: folderName })
             } else {
               resolve({ path: 'workspace' })
@@ -40,7 +38,6 @@ export class FileSystemService {
         })
       }
     } catch (error) {
-      console.log('用户取消了目录选择，使用默认工作区')
       // 如果用户取消选择，使用默认路径
       return { path: 'workspace' }
     }
@@ -251,7 +248,6 @@ export class FileSystemService {
         const writable = await fileHandle.createWritable()
         await writable.write(content as any)
         await writable.close()
-        console.log(`文件保存成功: ${filePath}`)
       } else {
         // 无句柄时不进行任何保存以避免弹窗
         console.warn('缺少工作区句柄，跳过文件保存:', filePath)
@@ -278,7 +274,6 @@ export class FileSystemService {
         const writable = await fileHandle.createWritable()
         await writable.write(content)
         await writable.close()
-        console.log(`文件创建成功: ${filePath}`)
       } else {
         console.warn('缺少工作区句柄，跳过文件创建:', filePath)
       }
@@ -291,7 +286,6 @@ export class FileSystemService {
   // 删除文件
   static async deleteFile(filePath: string, dirHandle?: any, workspacePath?: string): Promise<void> {
     // 在浏览器环境中，我们无法真正删除文件，只能记录操作
-    console.log(`删除文件操作: ${filePath}`)
     try {
       if (workspacePath && dirHandle && dirHandle.removeEntry) {
         const relative = filePath.startsWith(workspacePath)
@@ -455,7 +449,6 @@ export class FileSystemService {
           console.warn('删除源文件失败（可能已删除）:', srcPath)
         }
       }
-      console.log(`移动完成: ${srcPath} -> ${destPath}`)
     } catch (error) {
       console.error('移动文件失败:', error)
       throw error

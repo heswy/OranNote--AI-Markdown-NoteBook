@@ -39,7 +39,6 @@ export const MainLayout: React.FC = () => {
 
   // 处理文件点击
   const handleFileClick = async (filePath: string) => {
-    console.log(`点击文件: ${filePath}`)
     setActiveFile(filePath)
     addOpenFile(filePath)
   }

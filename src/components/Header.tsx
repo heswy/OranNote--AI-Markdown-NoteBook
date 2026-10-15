@@ -16,14 +16,11 @@ export const Header: React.FC = () => {
   const handleSelectWorkspace = async () => {
     try {
       setIsLoading(true)
-      console.log('开始选择工作区...')
       
       const result = await FileSystemService.selectWorkspace()
-      console.log(`选择的工作区路径: ${result.path}`)
       
       // 取消选择时不更新工作区（无句柄且返回占位名）
       if (!result.dirHandle && (result.path === 'workspace' || !result.path)) {
-        console.log('用户取消选择目录，保持当前工作区不变')
       } else {
         setConfig({ workspace: result.path })
         setWorkspace(result.path)
@@ -32,11 +29,8 @@ export const Header: React.FC = () => {
           setWorkspaceHandle(result.dirHandle)
         }
         // 加载文件树，如果有目录句柄则传入
-        console.log('加载文件树...')
         const files = await FileSystemService.getWorkspaceFiles(result.path, result.dirHandle)
-        console.log(`文件树加载完成，找到 ${files.length} 个顶级项目`)
         setFileTree(files)
-        console.log('工作区选择完成')
       }
     } catch (error) {
       console.error('选择工作区失败:', error)
