@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { X, Loader2, FileText, Folder } from 'lucide-react'
 import { useAppStore } from '@/stores/appStore'
 import { FileSystemService } from '@/services/fileSystem'
@@ -13,6 +13,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
   const [query, setQuery] = useState('')
   const [isSearching, setIsSearching] = useState(false)
   const [results, setResults] = useState<Array<{ path: string; name: string; type: 'file' | 'directory'; snippet?: string }>>([])
+  const [activeIndex, setActiveIndex] = useState(-1)
+  const listRef = useRef<HTMLDivElement>(null)
 
   const flattenFiles = useMemo(() => {
     const out: Array<{ path: string; name: string; type: 'file' | 'directory'; children?: any[] }> = []
@@ -60,45 +62,113 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
       if (res.length >= 200) break
     }
     setResults(res)
+    setActiveIndex(res.length > 0 ? 0 : -1)
     setIsSearching(false)
   }
 
+  // 快开：输入即筛选（只匹配文件名，不读文件内容；全文搜索仍走搜索按钮/回车）
+  // 只列文件，避免选中目录后回车无事发生
+  useEffect(() => {
+    if (!isOpen) return
+    const files = flattenFiles.filter(f => f.type === 'file')
+    const q = query.trim().toLowerCase()
+    const matched = q
+      ? files.filter(f => f.name.toLowerCase().includes(q))
+      : files
+    const list = matched.slice(0, 200).map(f => ({ path: f.path, name: f.name, type: f.type }))
+    setResults(list)
+    setActiveIndex(list.length > 0 ? 0 : -1)
+    setIsSearching(false)
+  }, [isOpen, query, flattenFiles])
+
+  // 打开/关闭时重置状态
   useEffect(() => {
     if (!isOpen) {
       setQuery('')
       setResults([])
       setIsSearching(false)
+      setActiveIndex(-1)
     }
   }, [isOpen])
+
+  // Esc 关闭（不依赖焦点位置）
+  useEffect(() => {
+    if (!isOpen) return
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        onClose()
+      }
+    }
+    window.addEventListener('keydown', handleEsc)
+    return () => window.removeEventListener('keydown', handleEsc)
+  }, [isOpen, onClose])
+
+  // 键盘选中的结果滚动到可视区域
+  useEffect(() => {
+    if (activeIndex < 0) return
+    const el = listRef.current?.querySelector(`[data-result-index="${activeIndex}"]`)
+    el?.scrollIntoView({ block: 'nearest' })
+  }, [activeIndex])
+
+  const openResult = useCallback((r: { path: string; type: 'file' | 'directory' }) => {
+    if (r.type === 'file') {
+      setActiveFile(r.path)
+      addOpenFile(r.path)
+    }
+    onClose()
+  }, [setActiveFile, addOpenFile, onClose])
+
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      if (results.length > 0) setActiveIndex(i => Math.min(i + 1, results.length - 1))
+      return
+    }
+    if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      if (results.length > 0) setActiveIndex(i => Math.max(i - 1, 0))
+      return
+    }
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      const current = results[activeIndex]
+      if (current) openResult(current)
+      else runSearch()
+    }
+  }
 
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div className="fixed inset-0 z-modal">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
       <div className="absolute left-1/2 top-24 -translate-x-1/2 w-full max-w-2xl bg-gray-800 border border-gray-700 rounded-lg shadow-xl">
         <div className="flex items-center justify-between px-3 py-2 border-b border-gray-700">
           <input
+            autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') runSearch() }}
-            placeholder="搜索当前目录中的文件名或内容"
+            onKeyDown={handleInputKeyDown}
+            placeholder="快速打开文件，↑↓ 选择，回车打开；或输入关键词后点“搜索”查全文"
             className="flex-1 bg-gray-700 text-gray-200 rounded px-3 py-2 focus:outline-none"
           />
           <button onClick={runSearch} className="ml-2 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">搜索</button>
           <button onClick={onClose} className="ml-2 p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded"><X className="w-5 h-5" /></button>
         </div>
-        <div className="max-h-96 overflow-auto p-2">
+        <div ref={listRef} className="max-h-96 overflow-auto p-2">
           {isSearching ? (
             <div className="flex items-center justify-center py-8 text-gray-400"><Loader2 className="w-5 h-5 animate-spin mr-2" />正在搜索…</div>
           ) : results.length === 0 ? (
-            <div className="text-center text-gray-500 py-8">无匹配结果</div>
+            <div className="text-center text-gray-500 py-8">{query.trim() ? '无匹配结果' : '工作区暂无文件'}</div>
           ) : (
-            results.map(r => (
+            results.map((r, index) => (
               <button
                 key={r.path}
-                onClick={() => { if (r.type === 'file') { setActiveFile(r.path); addOpenFile(r.path) } onClose() }}
-                className="w-full text-left px-2 py-2 rounded hover:bg-gray-700 text-gray-200"
+                data-result-index={index}
+                onMouseEnter={() => setActiveIndex(index)}
+                onClick={() => openResult(r)}
+                className={`w-full text-left px-2 py-2 rounded text-gray-200 ${index === activeIndex ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
               >
                 <div className="flex items-center">
                   {r.type === 'file' ? <FileText className="w-4 h-4 mr-2 text-yellow-400" /> : <Folder className="w-4 h-4 mr-2 text-yellow-500" />}

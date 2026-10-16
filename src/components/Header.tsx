@@ -7,10 +7,9 @@ import { AboutModal } from '@/components/AboutModal'
 import { SearchModal } from '@/components/SearchModal'
 
 export const Header: React.FC = () => {
-  const { config, setConfig, workspace, setWorkspace, setFileTree, setWorkspaceHandle, resetForNewWorkspace, setTheme } = useAppStore()
+  const { config, setConfig, workspace, setWorkspace, setFileTree, setWorkspaceHandle, resetForNewWorkspace, setTheme, isSearchOpen, setSearchOpen } = useAppStore()
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isAboutOpen, setIsAboutOpen] = useState(false)
 
   const handleSelectWorkspace = async () => {
@@ -87,7 +86,7 @@ export const Header: React.FC = () => {
         <div className="flex items-center gap-1">
           <HeaderButton 
             icon={<Search className="w-4 h-4" />} 
-            onClick={() => setIsSearchOpen(true)}
+            onClick={() => setSearchOpen(true)}
             tooltip="搜索文件 (⌘P)"
           />
           {/* 主题切换按钮 */}
@@ -115,7 +114,7 @@ export const Header: React.FC = () => {
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
       />
-      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+      <SearchModal isOpen={isSearchOpen} onClose={() => setSearchOpen(false)} />
       <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
     </>
   )
