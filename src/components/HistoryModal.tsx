@@ -41,7 +41,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose }) =
   }
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div className="fixed inset-0 z-modal">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
       <div className="absolute left-1/2 top-24 -translate-x-1/2 w-full max-w-2xl bg-gray-800 border border-gray-700 rounded-lg shadow-xl">
         <div className="flex items-center justify-between px-3 py-2 border-b border-gray-700">
