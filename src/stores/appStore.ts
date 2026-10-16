@@ -61,6 +61,8 @@ export interface AppState {
   isLoading: boolean
   leftWidth: number
   rightWidth: number
+  // 搜索面板开关（⌘P）
+  isSearchOpen: boolean
   currentSessionId?: string
   pendingContext: AIContext[]
   
@@ -90,6 +92,7 @@ export interface AppState {
   clearPendingContext: () => void
   setLeftWidth: (w: number) => void
   setRightWidth: (w: number) => void
+  setSearchOpen: (open: boolean) => void
   resetForNewWorkspace: () => void
   setTheme: (theme: 'light' | 'dark') => void
 }
@@ -124,6 +127,7 @@ export const useAppStore = create<AppState>()(
       isLoading: false,
       leftWidth: 320,
       rightWidth: 384,
+      isSearchOpen: false,
       currentSessionId: undefined,
       pendingContext: [],
       
@@ -196,6 +200,7 @@ export const useAppStore = create<AppState>()(
       clearPendingContext: () => set({ pendingContext: [] }),
       setLeftWidth: (w) => set({ leftWidth: w }),
       setRightWidth: (w) => set({ rightWidth: w }),
+      setSearchOpen: (isSearchOpen) => set({ isSearchOpen }),
       resetForNewWorkspace: () => set(() => ({
         activeFile: null,
         openFiles: [],

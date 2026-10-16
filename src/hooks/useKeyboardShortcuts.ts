@@ -21,7 +21,8 @@ export const useKeyboardShortcuts = () => {
     fileContents,
     workspace,
     workspaceHandle,
-    markSaved
+    markSaved,
+    setSearchOpen
   } = useAppStore()
 
   const saveCurrentFile = useCallback(async () => {
@@ -91,12 +92,20 @@ export const useKeyboardShortcuts = () => {
         },
         preventDefault: true,
       },
+      // 打开文件搜索: Cmd/Ctrl + P（浏览器默认是打印，需拦截）
+      {
+        key: 'p',
+        [metaKey]: true,
+        handler: () => setSearchOpen(true),
+        preventDefault: true,
+      },
     ]
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // 如果正在输入框中，不触发快捷键（除了保存）
+      // 如果正在输入框中，不触发快捷键（保存、搜索等在输入框内同样有效）
       const target = e.target as HTMLElement
       const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable
+      const inputAllowedKeys = ['s', 'p']
       
       for (const shortcut of shortcuts) {
         const ctrlMatch = shortcut.ctrl ? e.ctrlKey : !e.ctrlKey
@@ -106,8 +115,8 @@ export const useKeyboardShortcuts = () => {
         const keyMatch = e.key.toLowerCase() === shortcut.key.toLowerCase()
 
         if (ctrlMatch && metaMatch && shiftMatch && altMatch && keyMatch) {
-          // 对于非保存快捷键，如果在输入框中则跳过
-          if (isInput && shortcut.key !== 's') continue
+          // 对于输入框中不生效的快捷键则跳过
+          if (isInput && !inputAllowedKeys.includes(shortcut.key)) continue
           
           if (shortcut.preventDefault) {
             e.preventDefault()
@@ -120,7 +129,7 @@ export const useKeyboardShortcuts = () => {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [saveCurrentFile, setEditorMode, editorMode])
+  }, [saveCurrentFile, setEditorMode, editorMode, setSearchOpen])
 }
 
 export default useKeyboardShortcuts

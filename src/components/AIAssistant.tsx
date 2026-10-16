@@ -387,6 +387,7 @@ export const AIAssistant: React.FC = () => {
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const [historyOpen, setHistoryOpen] = useState(false)
   const [assistantMenuOpen, setAssistantMenuOpen] = useState(false)
+  const [isDragOverInput, setIsDragOverInput] = useState(false)
   const abortRef = useRef<AbortController | null>(null)
   const lastMessageCountRef = useRef(0)
   const isStreamingRef = useRef(false)
@@ -619,21 +620,30 @@ export const AIAssistant: React.FC = () => {
     const lastAtIndex = value.lastIndexOf('@')
     if (lastAtIndex !== -1) {
       const query = value.substring(lastAtIndex + 1)
-      if (!query.includes('\n')) {
+      // 已是完整引用（@"路径"）时不弹出提及建议，避免拖拽引用后再输入触发空弹窗
+      const isQuotedRef = /^\s*["']/.test(query)
+      if (!query.includes('\n') && !isQuotedRef) {
         setShowMentions(true)
         setMentionQuery(query.trim())
+      } else {
+        setShowMentions(false)
       }
     } else {
       setShowMentions(false)
     }
   }
 
-  // 选择提及项
-  const handleMentionSelect = (item: {type:'file'|'folder'|'workspace', name:string, path?:string}) => {
+  // 加入引用标签（按类型+路径去重）
+  const addSelectedMention = useCallback((item: {type:'file'|'folder'|'workspace', name:string, path?:string}) => {
     setSelectedMentions(prev => {
       if (prev.find(p => p.path === item.path && p.type === item.type)) return prev
       return [...prev, item]
     })
+  }, [])
+
+  // 选择提及项
+  const handleMentionSelect = (item: {type:'file'|'folder'|'workspace', name:string, path?:string}) => {
+    addSelectedMention(item)
     
     const current = inputRef.current?.value || inputMessage
     const atIndex = current.lastIndexOf('@')
@@ -654,6 +664,91 @@ export const AIAssistant: React.FC = () => {
       setSelectedMentions(prev => prev.slice(0, -1))
     }
   }
+
+  // 查找工作区节点（校验拖拽来源）
+  const findWorkspaceNode = useCallback((path: string): any => {
+    const walk = (nodes: any[]): any => {
+      for (const n of nodes) {
+        if (n.path === path) return n
+        if (n.children) {
+          const hit = walk(n.children)
+          if (hit) return hit
+        }
+      }
+      return null
+    }
+    return walk(fileTree)
+  }, [fileTree])
+
+  // 在光标处插入引用文本（拖拽文件到输入框）
+  const insertReferenceAtCursor = (path: string) => {
+    const textarea = inputRef.current
+    const start = textarea ? textarea.selectionStart : inputMessage.length
+    const end = textarea ? textarea.selectionEnd : inputMessage.length
+    const before = inputMessage.slice(0, start)
+    const after = inputMessage.slice(end)
+    const ref = `@"${path}"`
+    const leading = before.length > 0 && !/\s$/.test(before) ? ' ' : ''
+    const trailing = after.length > 0 && !/^\s/.test(after) ? ' ' : ''
+    const insertion = `${leading}${ref}${trailing}`
+    const caret = before.length + leading.length + ref.length
+
+    setInputMessage(before + insertion + after)
+    // 拖拽插入的路径已带引号，不再触发 @ 提及弹窗
+    setShowMentions(false)
+    setMentionQuery('')
+
+    requestAnimationFrame(() => {
+      const el = inputRef.current
+      if (!el) return
+      el.focus()
+      el.setSelectionRange(caret, caret)
+      el.style.height = 'auto'
+      el.style.height = Math.min(el.scrollHeight, 128) + 'px'
+    })
+  }
+
+  // 拖拽悬停：仅接受来自文件树的路径（text/plain）
+  const handleInputDragOver = (e: React.DragEvent) => {
+    if (isLoading) return
+    if (!Array.from(e.dataTransfer.types || []).includes('text/plain')) return
+    e.preventDefault()
+    // 文件树以 effectAllowed='move' 起拖，dropEffect 需与其兼容，否则会被浏览器重置为 none
+    e.dataTransfer.dropEffect = e.dataTransfer.effectAllowed === 'move' ? 'move' : 'copy'
+    setIsDragOverInput(true)
+  }
+
+  // 拖拽离开：仍在输入区内则不取消高亮
+  const handleInputDragLeave = (e: React.DragEvent) => {
+    const next = e.relatedTarget as Node | null
+    if (next && e.currentTarget.contains(next)) return
+    setIsDragOverInput(false)
+  }
+
+  const handleInputDrop = (e: React.DragEvent) => {
+    setIsDragOverInput(false)
+    if (isLoading) return
+    const path = e.dataTransfer.getData('text/plain')?.trim()
+    if (!path) return
+    // 忽略其它来源的拖拽（外部文本、外部文件等）
+    const node = findWorkspaceNode(path)
+    if (!node) return
+    e.preventDefault()
+    insertReferenceAtCursor(path)
+    // 同时登记为引用标签，让文件内容随消息一起发送
+    addSelectedMention({ type: node.type === 'file' ? 'file' : 'folder', name: node.name, path })
+  }
+
+  // 拖拽结束（含 Esc 取消、落到别处）时兜底清除高亮
+  useEffect(() => {
+    const clear = () => setIsDragOverInput(false)
+    window.addEventListener('dragend', clear)
+    window.addEventListener('drop', clear)
+    return () => {
+      window.removeEventListener('dragend', clear)
+      window.removeEventListener('drop', clear)
+    }
+  }, [])
 
   // 获取当前助手名称
   const activeAssistantName = (() => {
@@ -814,16 +909,22 @@ export const AIAssistant: React.FC = () => {
                 </div>
               )}
 
-              <div className="flex gap-2 items-end">
+              <div
+                className="flex gap-2 items-end"
+                onDragOver={handleInputDragOver}
+                onDragLeave={handleInputDragLeave}
+                onDrop={handleInputDrop}
+              >
                 <textarea
                   ref={inputRef}
                   value={inputMessage}
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
                   placeholder="输入消息，使用 @ 引用文件..."
-                  className="flex-1 min-h-10 max-h-32 px-3 py-2 bg-bg-surface border border-border rounded-xl text-sm text-text-primary 
+                  className={`flex-1 min-h-10 max-h-32 px-3 py-2 bg-bg-surface border rounded-xl text-sm text-text-primary 
                     placeholder:text-text-disabled resize-none leading-5 m-0 overflow-y-auto
-                    focus:outline-none focus:ring-0 focus:border-border transition-colors"
+                    focus:outline-none focus:ring-0 transition-colors
+                    ${isDragOverInput ? 'border-primary-500 ring-2 ring-primary-500/30 border-dashed' : 'border-border focus:border-border'}`}
                   rows={1}
                   disabled={isLoading}
                 />
