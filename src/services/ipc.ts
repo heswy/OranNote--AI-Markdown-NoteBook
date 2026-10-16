@@ -10,14 +10,23 @@ export interface PingResult {
   chrome: string
 }
 
+// pdf:export 入参：待打印 HTML（渲染层构造）+ 保存对话框默认文件名
+export interface ExportPdfOptions {
+  html: string
+  suggestedName?: string
+}
+
 export interface ExportPdfResult {
   ok: boolean
+  // 成功时为实际落盘路径
+  path?: string
+  // 失败原因（用户取消为 'canceled'）
   reason?: string
 }
 
 export interface OrannoteBridge {
   ping(): Promise<PingResult>
-  exportPdf(options?: unknown): Promise<ExportPdfResult>
+  exportPdf(options: ExportPdfOptions): Promise<ExportPdfResult>
 }
 
 declare global {

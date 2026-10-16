@@ -18,6 +18,8 @@ import {
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 import fontkit from '@pdf-lib/fontkit'
 import { FileSystemService } from '@/services/fileSystem'
+import { getBridge } from '@/services/ipc'
+import { buildPrintHtml, suggestPdfFileName } from '@/services/pdfExport'
 import { marked } from 'marked'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/github-dark.css'
@@ -307,6 +309,7 @@ export const MarkdownEditor: React.FC = () => {
   
   const [content, setContent] = useState('')
   const [isSaving, setIsSaving] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
   const [savedIndicator, setSavedIndicator] = useState(false)
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const previewRef = useRef<HTMLDivElement>(null)
@@ -416,14 +419,48 @@ export const MarkdownEditor: React.FC = () => {
     }
   }
 
-  // 导出 PDF
+  // 编辑模式下没有预览 DOM，用同一套渲染逻辑生成离屏内容供导出
+  const buildOffscreenPreview = (markdownText: string): HTMLElement => {
+    const holder = document.createElement('div')
+    holder.className = 'markdown-preview'
+    // marked 走同步渲染，这里的 __html 一定是字符串（类型上是 string | Promise<string>）
+    const html = renderMarkdown(markdownText).__html
+    holder.innerHTML = typeof html === 'string' ? html : ''
+    return holder
+  }
+
+  // 导出 PDF：渲染层构造独立打印 HTML，经 Electron IPC 桥交给主进程 printToPDF
   const handleExportPdf = async () => {
     if (!activeFile || !activeFile.toLowerCase().endsWith('.md')) {
       toast.error('仅支持 Markdown 文件导出')
       return
     }
-    toast.info('正在生成 PDF...')
-    // 这里简化处理，实际实现可能需要更复杂的逻辑
+    const bridge = getBridge()
+    if (!bridge) {
+      toast.error('当前环境不支持导出 PDF，请在桌面应用中使用')
+      return
+    }
+    setIsExporting(true)
+    toast.info('正在生成 PDF...', { id: 'pdf-export' })
+    try {
+      const fileName = activeFile.split('/').pop() || 'orannote.md'
+      // 预览模式/分屏模式直接取预览区 DOM，保证导出内容与所见一致
+      const source = editorMode === 'edit' ? buildOffscreenPreview(content) : previewContentRef.current
+      const html = await buildPrintHtml({ fileName, source })
+      const result = await bridge.exportPdf({ html, suggestedName: suggestPdfFileName(fileName) })
+      if (result.ok && result.path) {
+        toast.success(`PDF 已导出：${result.path}`, { id: 'pdf-export', duration: 5000 })
+      } else if (result.reason === 'canceled') {
+        toast.info('已取消导出', { id: 'pdf-export' })
+      } else {
+        toast.error(`导出失败：${result.reason || '未知原因'}`, { id: 'pdf-export' })
+      }
+    } catch (error) {
+      console.error('导出 PDF 失败:', error)
+      toast.error(`导出失败：${error instanceof Error ? error.message : String(error)}`, { id: 'pdf-export' })
+    } finally {
+      setIsExporting(false)
+    }
   }
 
   // 预览图片处理
@@ -594,6 +631,7 @@ export const MarkdownEditor: React.FC = () => {
               onClick={handleExportPdf}
               disabled={!activeFile?.toLowerCase().endsWith('.md')}
               tooltip="导出 PDF"
+              loading={isExporting}
             />
           </div>
         </div>
